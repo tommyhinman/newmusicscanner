@@ -23,6 +23,68 @@ Resources:
           Properties:
             Path: /hello
             Method: get
+  TrackedArtistsFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: new-music-scanner/
+      Handler: trackedArtists.getTrackedArtistsLambdaHandler
+      Runtime: nodejs12.x
+
+  ArtistScanFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: new-music-scanner/
+      Handler: artistScan.artistScanLambdaHandler
+      Runtime: nodejs12.x
+
+  ##################
+  # Dynamo Tables! #
+  ##################
+  TrackedArtistsTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      AttributeDefinitions:
+        -
+          AttributeName: "artistId"
+          AttributeType: "S"
+      KeySchema:
+        -
+          AttributeName: "artistId"
+          KeyType: "HASH"
+      ProvisionedThroughput:
+        ReadCapacityUnits: "5"
+        WriteCapacityUnits: "5"
+      TableName: "newMusicScanner-trackedArtists"
+  ScanRequestsTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      AttributeDefinitions:
+        -
+          AttributeName: "requestId"
+          AttributeType: "S"
+      KeySchema:
+        -
+          AttributeName: "requestId"
+          KeyType: "HASH"
+      ProvisionedThroughput:
+        ReadCapacityUnits: "5"
+        WriteCapacityUnits: "5"
+      TableName: "newMusicScanner-scanRequests"
+  KnownAlbumsTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      AttributeDefinitions:
+        -
+          AttributeName: "artistId"
+          AttributeType: "S"
+      KeySchema:
+        -
+          AttributeName: "artistId"
+          KeyType: "HASH"
+      ProvisionedThroughput:
+        ReadCapacityUnits: "5"
+        WriteCapacityUnits: "5"
+      TableName: "newMusicScanner-knownAlbums"
 
 Outputs:
   # ServerlessRestApi is an implicit API created out of Events key under Serverless::Function
@@ -37,3 +99,17 @@ Outputs:
   HelloWorldFunctionIamRole:
     Description: "Implicit IAM Role created for Hello World function"
     Value: !GetAtt HelloWorldFunctionRole.Arn
+
+  TrackedArtistsFunction:
+    Description: "Tracked Artists Lambda Function ARN"
+    Value: !GetAtt TrackedArtistsFunction.Arn
+  TrackedArtistsFunctionIamRole:
+    Description: "Implicit IAM Role created for Tracked Artists function"
+    Value: !GetAtt TrackedArtistsFunctionRole.Arn
+
+  ArtistScanFunction:
+    Description: "Artist Scan Lambda function ARN"
+    Value: !GetAtt ArtistScanFunction.Arn
+  ArtistScanFunctionIamRole:
+    Description: "Implicit IAM Role created for Artist Scan function"
+    Value: !GetAtt ArtistScanFunctionRole.Arn

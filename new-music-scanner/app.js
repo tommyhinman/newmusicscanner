@@ -1,6 +1,6 @@
 // const axios = require('axios')
 // const url = 'http://checkip.amazonaws.com/';
-const spotify = require('./spotify')
+const spotify = require('./util/spotify')
 const util = require('util');
 let response;
 
