@@ -10,7 +10,7 @@ function filterAlbumIds(artistAlbumData) {
 
     try {
         itemList.forEach(function(album) {
-            console.log("Album: " + album.name);
+            // console.log("Album: " + album.name);
             albumList.push({
                 "albumId": album.id,
                 "albumName": album.name,
@@ -116,7 +116,6 @@ module.exports = {
 
         console.log("Getting first 50 artist albums from Spotify for artist ID ", artistId)
         var firstArtistAlbumData = await queryArtistAlbumData(authToken, artistId, 0);
-        console.log("Filtering out album IDs from response.")
         for(var artistAlbum of filterAlbumIds(firstArtistAlbumData)) {
             artistAlbums.push(artistAlbum);
         }

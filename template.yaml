@@ -95,6 +95,28 @@ Resources:
         ReadCapacityUnits: "5"
         WriteCapacityUnits: "5"
       TableName: "newMusicScanner-knownAlbums"
+  FoundAlbumsTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      AttributeDefinitions:
+        -
+          AttributeName: "requestId"
+          AttributeType: "S"
+        -
+          AttributeName: "artistId"
+          AttributeType: "S"
+      KeySchema:
+        -
+          AttributeName: "requestId"
+          KeyType: "HASH"
+        -
+          AttributeName: "artistId"
+          KeyType: "RANGE"
+      ProvisionedThroughput:
+        ReadCapacityUnits: "5"
+        WriteCapacityUnits: "5"
+      TableName: "newMusicScanner-foundAlbums"
+
 
 Outputs:
   # ServerlessRestApi is an implicit API created out of Events key under Serverless::Function
