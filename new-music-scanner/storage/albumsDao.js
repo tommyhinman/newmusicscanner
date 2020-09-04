@@ -1,4 +1,4 @@
-const { getDataFromDynamo, putDataInDynamo } = require('../util/dynamoDB');
+const { getDataFromDynamo, putDataInDynamo, scanDynamoTable } = require('../util/dynamoDB');
 
 module.exports = {
   getKnownAlbums: async function(artistId) {
@@ -45,6 +45,18 @@ module.exports = {
       const result = await putDataInDynamo(params);
     }
     console.log("Finished storing newly-found albums.");
+  },
+  getFoundAlbumsForRequest: async function(requestId) {
+    console.log("Retrieving all found albums for requestId " + requestId);
+    const params = {
+      TableName: 'newMusicScanner-foundAlbums',
+      FilterExpression: 'requestId = :request_id',
+      ExpressionAttributeValues: {
+        ':request_id': requestId
+      }
+    };
+
+    return foundAlbums = await scanDynamoTable(params);
   }
 
 }

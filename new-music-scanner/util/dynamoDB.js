@@ -29,6 +29,20 @@ function putDataInDynamo(params) {
 	});
 }
 
+function queryDynamo(params) {
+	return new Promise(resolve => {
+		const docClient = new AWS.DynamoDB.DocumentClient({apiVersion: '2012-08-10'});
+		docClient.query(params, function(err, data) {
+			if (err) {
+				console.log(err);
+			} else {
+				console.log("Success: ", data);
+				resolve(data);
+			}
+		});
+	});
+}
+
 function scanDynamoTable(params) {
 	return new Promise(resolve => {
 		var docClient = new AWS.DynamoDB.DocumentClient({apiVersion: '2012-08-10'});
@@ -60,6 +74,7 @@ function updateDataInDynamo(params) {
 module.exports = {
   getDataFromDynamo: getDataFromDynamo,
   putDataInDynamo: putDataInDynamo,
+	queryDynamo: queryDynamo,
   updateDataInDynamo: updateDataInDynamo,
   scanDynamoTable: scanDynamoTable,
 }
