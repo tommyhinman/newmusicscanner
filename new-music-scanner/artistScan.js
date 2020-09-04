@@ -19,12 +19,12 @@ async function artistScan() {
 
 exports.artistScanLambdaHandler = async (event, context) => {
   try {
-    const executionId = event.executionId;
+    const requestId = event.requestId;
     const artistId = event.artist.artistId;
     const artistName = event.artist.artistName;
 
     console.log("Scanning artist " + artistName + " with ID " + artistId);
-    console.log("Execution ID: " + executionId);
+    console.log("Request ID: " + requestId);
 
     const newAlbumCount = 5;
 

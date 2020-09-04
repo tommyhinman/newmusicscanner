@@ -11,6 +11,9 @@ Globals:
     Timeout: 100
 
 Resources:
+  #####################
+  # Lambda Functions! #
+  #####################
   HelloWorldFunction:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
     Properties:
@@ -35,6 +38,13 @@ Resources:
     Properties:
       CodeUri: new-music-scanner/
       Handler: artistScan.artistScanLambdaHandler
+      Runtime: nodejs12.x
+
+  NewScanRequestFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: new-music-scanner/
+      Handler: scanRequests.newScanRequestLambdaHandler
       Runtime: nodejs12.x
 
   ##################
