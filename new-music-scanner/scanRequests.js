@@ -2,6 +2,7 @@ const util = require('util');
 const { v4: uuidv4}  = require('uuid');
 const { createRequest, getLatestRequest } = require('./storage/requestsDao');
 const { getFoundAlbumsForRequest } = require('./storage/albumsDao');
+const moment = require('moment');
 
 let response;
 
@@ -35,8 +36,17 @@ exports.getLatestRequestLambdaHandler = async (event, context) => {
 
   const foundAlbums = await getFoundAlbumsForRequest(latestRequest.requestId);
 
+
+  const totalArtistCount = foundAlbums.Items.length;
+  var totalAlbumCount = 0;
+  foundAlbums.Items.forEach( (artist) => {
+    totalAlbumCount += artist.albums.length;
+  })
+
   // For now, just respond with a human-readable string.
-  var response = "";
+  const dateString = moment(latestRequest.requestTime).utcOffset(-8).format("LLL");
+  var response = "Latest scan request: " + dateString + " with ID " + latestRequest.requestId + "\n";
+  response += "Found " + totalArtistCount + " artists and " + totalAlbumCount + " albums.";
   foundAlbums.Items.forEach( (artist) => {
     response += artist.artistName + ":\n";
 
