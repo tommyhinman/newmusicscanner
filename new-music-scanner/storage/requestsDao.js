@@ -1,4 +1,4 @@
-const { putDataInDynamo, scanDynamoTable } = require('../util/dynamoDB');
+const { getDataFromDynamo, putDataInDynamo, scanDynamoTable } = require('../util/dynamoDB');
 
 module.exports = {
   createRequest: async function(requestId, requestTime) {
@@ -11,6 +11,17 @@ module.exports = {
         }
     };
     request = await putDataInDynamo(params);
+  },
+  getRequest: async function(requestId) {
+    const params = {
+      TableName: 'newMusicScanner-scanRequests',
+      FilterExpression: 'requestId = :request_id',
+      ExpressionAttributeValues: {':request_id': requestId}
+    };
+    var request = await scanDynamoTable(params);
+
+    //This response will always only have one result, unless something has gone terribly wrong.
+    return request.Items[0];
   },
   getLatestRequest: async function() {
     /*
@@ -30,6 +41,34 @@ module.exports = {
       }
     });
     return latestRequest;
+  },
+  storeScanRequestData: async function(requestId, requestData) {
+    /*
+
+    */
+    console.log("Storing scan request data for request ID " + requestId);
+    const params = {
+      TableName: 'newMusicScanner-scanRequestData',
+      Item: {
+        'requestId': requestId,
+        'requestData': requestData
+      }
+    };
+    var request = await putDataInDynamo(params);
+  },
+  getScanRequestData: async function(requestId) {
+    /*
+
+    */
+    console.log("Retrieving scan request data for request ID " + requestId);
+    const params = {
+      TableName: 'newMusicScanner-scanRequestData',
+      Key: {
+        'requestId': requestId
+      }
+    };
+    var requestData = await getDataFromDynamo(params);
+    return requestData.requestData;
   }
 }
 

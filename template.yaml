@@ -53,6 +53,13 @@ Resources:
       Handler: scanRequests.newScanRequestLambdaHandler
       Runtime: nodejs12.x
 
+  ProcessScanRequestFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: new-music-scanner/
+      Handler: scanRequests.processScanRequestLambdaHandler
+      Runtime: nodejs12.x
+
   GetLatestRequestFunction:
     Type: AWS::Serverless::Function
     Properties:
@@ -64,6 +71,19 @@ Resources:
           Type: Api
           Properties:
             Path: /latestRequest
+            Method: get
+
+  GetRequestFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: new-music-scanner/
+      Handler: scanRequests.getRequestLambdaHandler
+      Runtime: nodejs12.x
+      Events:
+        GetRequest:
+          Type: Api
+          Properties:
+            Path: /request
             Method: get
 
   ##################
@@ -141,7 +161,21 @@ Resources:
         ReadCapacityUnits: "5"
         WriteCapacityUnits: "5"
       TableName: "newMusicScanner-foundAlbums"
-
+  ScanRequestDataTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      AttributeDefinitions:
+        -
+          AttributeName: "requestId"
+          AttributeType: "S"
+      KeySchema:
+        -
+          AttributeName: "requestId"
+          KeyType: "HASH"
+      ProvisionedThroughput:
+        ReadCapacityUnits: "5"
+        WriteCapacityUnits: "5"
+      TableName: "newMusicScanner-scanRequestData"
 
 Outputs:
   # ServerlessRestApi is an implicit API created out of Events key under Serverless::Function
@@ -172,5 +206,9 @@ Outputs:
     Value: !GetAtt ArtistScanFunctionRole.Arn
 
   LatestRequestApi:
-    Description: "API Gateway endponit URL for Prod stage for Get Latest Request function."
+    Description: "API Gateway endpoint URL for Prod stage for Get Latest Request function."
     Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/latestRequest"
+
+  RequestApi:
+    Description: "API Gateway endpoint URL for Prod state for Get Request function."
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/request"

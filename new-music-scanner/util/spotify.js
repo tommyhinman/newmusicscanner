@@ -15,7 +15,10 @@ function filterAlbumIds(artistAlbumData) {
                 "albumId": album.id,
                 "albumName": album.name,
                 "albumType": album.album_type,
-                "albumUri": album.external_urls.spotify
+                "albumUri": album.external_urls.spotify,
+                "releaseDate": album.release_date,
+                "releaseDatePrecision": album.release_date_precision,
+                "albumArtists": album.artists,
             })
         })
     } catch (err) {
