@@ -42,6 +42,26 @@ module.exports = {
     });
     return latestRequest;
   },
+  getRecentRequests: async function(requestCount) {
+    /*
+      This gets the N most recent requests. See above comment - there's probably a smarter way to do this.
+      (Also obviously - refactor this to get rid of the above function, it can just be n=1).
+
+      IMO probably just switch to S3 or something since this is read-often and write-once-per-day.
+    */
+    console.log("Getting " + requestCount + " most recent requests.");
+    const params = {
+      TableName: 'newMusicScanner-scanRequests',
+    };
+    const requestData = await scanDynamoTable(params);
+    const recentRequestsUnordered = requestData.Items;
+    const recentRequestsOrdered = recentRequestsUnordered.sort( function(a, b) {
+      return b.requestTime - a.requestTime;
+    });
+
+    // return requestData.Items.slice(0, requestCount - 1);
+    return recentRequestsOrdered.slice(0, requestCount);
+  },
   storeScanRequestData: async function(requestId, requestData) {
     /*
 

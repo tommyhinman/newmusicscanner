@@ -73,6 +73,19 @@ Resources:
             Path: /latestRequest
             Method: get
 
+  GetRecentRequestsFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: new-music-scanner/
+      Handler: scanRequests.getRecentRequestsLambdaHandler
+      Runtime: nodejs12.x
+      Events:
+        GetRecentRequests:
+          Type: Api
+          Properties:
+            Path: /recentRequests
+            Method: get
+
   GetRequestFunction:
     Type: AWS::Serverless::Function
     Properties:

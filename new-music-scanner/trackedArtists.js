@@ -28,10 +28,24 @@ async function updateTrackedArtistsFromPlaylist(playlistId) {
   }
 }
 
+function getMockTrackedArtistsData() {
+  return [
+    {"artistName":"The Weakerthans","artistId":"1US3cA3tVZ50O7n4xE1o0K"},
+    {"artistName":"The Brian Jonestown Massacre","artistId":"30uiS1n3uIGXJEYFR1GVDy"},
+  ];
+}
+
 exports.getTrackedArtistsLambdaHandler = async (event, context) => {
+  var returnMockData = event.returnMockData;
   var response;
   try {
-    const artistsList = await getTrackedArtistsFromStorage();
+    var artistsList;
+    if (returnMockData) {
+      artistsList = getMockTrackedArtistsData();
+    } else {
+      artistsList = await getTrackedArtistsFromStorage();
+    }
+    
     response = {
       artists: artistsList,
     }

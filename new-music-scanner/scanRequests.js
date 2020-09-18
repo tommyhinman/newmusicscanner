@@ -1,6 +1,6 @@
 const util = require('util');
 const { v4: uuidv4}  = require('uuid');
-const { createRequest, getLatestRequest, getRequest, storeScanRequestData, getScanRequestData } = require('./storage/requestsDao');
+const { createRequest, getLatestRequest, getRecentRequests, getRequest, storeScanRequestData, getScanRequestData } = require('./storage/requestsDao');
 const { getFoundAlbumsForRequest } = require('./storage/albumsDao');
 const moment = require('moment-timezone');
 const { flattenRequestFoundAlbums, filterRequestFoundAlbums, prioritizeRequestFoundAlbums } = require('requestProcessor/requestProcessor')
@@ -157,4 +157,19 @@ exports.processScanRequestLambdaHandler = async (event, context) => {
     console.log(error);
     return error;
   }
+}
+
+exports.getRecentRequestsLambdaHandler = async (event, context)  => {
+
+  var recentRequests = await getRecentRequests(10);
+
+  return {
+    'statusCode': 200,
+    'headers': {
+      "Access-Control-Allow-Headers" : "Content-Type",
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Methods": "OPTIONS,POST,GET"
+    },
+    'body': JSON.stringify(recentRequests),
+  };
 }
