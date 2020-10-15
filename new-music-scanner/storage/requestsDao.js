@@ -21,7 +21,7 @@ module.exports = {
     var request = await scanDynamoTable(params);
 
     //This response will always only have one result, unless something has gone terribly wrong.
-    return request.Items[0];
+    return request[0];
   },
   getLatestRequest: async function() {
     /*
@@ -35,7 +35,7 @@ module.exports = {
     };
     const requestData = await scanDynamoTable(params);
     var latestRequest;
-    requestData.Items.forEach( (request) => {
+    requestData.forEach( (request) => {
       if(latestRequest == null || request.requestTime > latestRequest.requestTime) {
         latestRequest = request;
       }
@@ -54,12 +54,11 @@ module.exports = {
       TableName: 'newMusicScanner-scanRequests',
     };
     const requestData = await scanDynamoTable(params);
-    const recentRequestsUnordered = requestData.Items;
+    const recentRequestsUnordered = requestData;
     const recentRequestsOrdered = recentRequestsUnordered.sort( function(a, b) {
       return b.requestTime - a.requestTime;
     });
 
-    // return requestData.Items.slice(0, requestCount - 1);
     return recentRequestsOrdered.slice(0, requestCount);
   },
   storeScanRequestData: async function(requestId, requestData) {

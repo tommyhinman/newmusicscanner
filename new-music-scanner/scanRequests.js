@@ -53,7 +53,7 @@ async function processScanRequest(requestId) {
   // console.log(JSON.stringify(foundAlbums));
 
   // 2) Deduplicate and flatten foundAlbum structure
-  const flattenedAlbums = await flattenRequestFoundAlbums(foundAlbumsByArtist.Items);
+  const flattenedAlbums = await flattenRequestFoundAlbums(foundAlbumsByArtist);
 
   // 3) Filter out unwanted albums.
   const filteredAlbums = await filterRequestFoundAlbums(flattenedAlbums);

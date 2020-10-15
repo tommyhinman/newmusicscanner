@@ -48,6 +48,25 @@ async function querySpotifyApi(authToken, url) {
   }
 }
 
+async function spotifyApiDelete(authToken, url, data) {
+  try {
+    const response = await axios.delete(
+      url,
+      {
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type':'application/x-www-form-urlencoded',
+          'Authorization': 'Bearer ' + authToken,
+        },
+        data: data
+      }
+    );
+  } catch (error) {
+    const errorMessage = "Error calling DELETE api from Spotify with url: " + url);
+    console.error(errorMessage, error);
+  }
+}
+
 // Retrieve a Spotify auth token, for use in future APIs.
 // Reference: https://developer.spotify.com/documentation/general/guides/authorization-guide/
 // Borrowed from: https://gist.github.com/donstefani/70ef1069d4eab7f2339359526563aab2
@@ -92,7 +111,7 @@ async function queryArtistAlbumData(authToken, artistId, offset) {
 
 // Calls Spotify's API get to get all playlist data for a playlist ID.
 // Spotify limits to 50 tracks per result, so pass in an offset to get more.
-async function queryPlaylist(authToken, playlistId, offset) {
+async function queryPlaylistTracks(authToken, playlistId, offset) {
   const spotifyUrl = 'https://api.spotify.com/v1/playlists/' + playlistId + '/tracks?limit=50&market=US&offset=' + offset;
   return await querySpotifyApi(authToken, spotifyUrl);
 }
@@ -107,6 +126,11 @@ async function queryArtist(authToken, artistId) {
 async function queryAlbum(authToken, albumId) {
   const spotifyUrl = 'https://api.spotify.com/v1/albums/' + albumId;
   return await querySpotifyApi(authToken, spotifyUrl);
+}
+
+async function removePlaylistTracks(authToken, playlistId, tracks) {
+  const spotifyUrl = 'https://api.spotify.com/v1/playlists/' + playlistId + '/tracks';
+
 }
 
 
@@ -143,7 +167,7 @@ module.exports = {
         var uniqueArtistIds = new Set();
 
         console.log("Querying first 50 for playlistId ", playlistId);
-        var firstPlaylistData = await queryPlaylist(authToken, playlistId, 0);
+        var firstPlaylistData = await queryPlaylistTracks(authToken, playlistId, 0);
         for(var playlistItem of firstPlaylistData.items) {
             for(var curItemArtist of playlistItem.track.artists) {
               if(!uniqueArtistIds.has(curItemArtist.id)) {
@@ -158,7 +182,7 @@ module.exports = {
         }
         if(firstPlaylistData.total > 50) {
             for(var currentOffset = 50; currentOffset < firstPlaylistData.total; currentOffset += 50) {
-                var playlistData = await queryPlaylist(authToken, playlistId, currentOffset);
+                var playlistData = await queryPlaylistTracks(authToken, playlistId, currentOffset);
                 for(var playlistItem of playlistData.items) {
                     for(var curItemArtist of playlistItem.track.artists) {
                       if(!uniqueArtistIds.has(curItemArtist.id)) {

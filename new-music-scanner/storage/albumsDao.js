@@ -56,7 +56,9 @@ module.exports = {
       }
     };
 
-    return foundAlbums = await scanDynamoTable(params);
+    const foundAlbums = await scanDynamoTable(params);
+    console.log("Found " + foundAlbums.length + " albums for requestId " + requestId);
+    return foundAlbums;
   }
 
 }

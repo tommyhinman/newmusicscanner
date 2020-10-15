@@ -78,7 +78,7 @@ module.exports = {
     for( var processedAlbumId in processedAlbumsByAlbumId) {
       flattenedAlbums.push(processedAlbumsByAlbumId[processedAlbumId]);
     }
-    console.log("Filtered albums!");
+    console.log("Flattened albums!");
     // console.log(flattenedAlbums);
 
     return flattenedAlbums;

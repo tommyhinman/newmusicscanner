@@ -8,7 +8,7 @@ module.exports = {
 
 		var artistsData = await scanDynamoTable(params);
 
-		return artistsData.Items;
+		return artistsData;
 	},
 	// Add artist to tracked artists. Returns true if artist did not already exist.
 	putArtist: async function(artist) {
