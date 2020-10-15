@@ -29,8 +29,35 @@ function isAlbumNewRelease(album, request) {
 	return false;
 }
 
+function isAlbumByTrackedArtist(album, request) {
+  var trackedArtistIds = [];
+  album.primaryArtists.forEach( (primaryArtist) => {
+    trackedArtistIds.push(primaryArtist.id);
+  });
+
+  var hasTrackedArtistAsAlbumArtist = false;
+  album.albumArtists.forEach( (albumArtist) => {
+    if (trackedArtistIds.includes(albumArtist.id)) {
+      hasTrackedArtistAsAlbumArtist = true;
+    }
+  });
+  return hasTrackedArtistAsAlbumArtist;
+}
+
 function shouldFilterAlbum(album) {
   return isAlbumVariousArtists(album);
+}
+
+function getAlbumPriority(album, request) {
+  if (!isAlbumNewRelease(album, request)) {
+    return "low";
+  }
+
+  if (isAlbumByTrackedArtist(album, request)) {
+    return "high";
+  }
+
+  return "medium";
 }
 
 function isAlbumHighPriority(album, request) {
@@ -100,7 +127,39 @@ module.exports = {
     return filteredAlbums;
   },
 
-  //TODO sort function!
+  /*
+    Sort albums alphabetically, and group different album types next to each other.
+    Valid album types from Spotify are {single, album, compilation}.
+
+    I'm using the word "album" as the generic term as well, which is a bit confusing!
+  */
+  sortRequestFoundAlbums: async function(albums) {
+
+    // Sort by alpha order of first listed album artist.
+    albums.sort( function(a, b) {
+      const albumArtistA = a.albumArtists[0].name.toUpperCase();
+      const albumArtistB = b.albumArtists[0].name.toUpperCase();
+      return (albumArtistA < albumArtistB) ? -1 : (albumArtistA > albumArtistB) ? 1 : 0;
+    });
+
+    // Group up by album type and then squash back into a flat list.
+    // At some point I may want to actually leave these in separate lists, so they can be displayed as such.
+    var albumsSubset = [];
+    var singlesSubset = [];
+    var compilationsSubset = [];
+    albums.forEach( (album) => {
+      if (album.albumType == "album") {
+        albumsSubset.push(album);
+      } else if (album.albumType == "single") {
+        singlesSubset.push(album);
+      } else if (album.albumType == "compilation") {
+        compilationsSubset.push(album);
+      }
+    });
+
+    const sortedAlbums = albumsSubset.concat(singlesSubset, compilationsSubset);
+    return sortedAlbums;
+  },
 
   /*
     Takes in a list of albums,
@@ -109,12 +168,16 @@ module.exports = {
   prioritizeRequestFoundAlbums: async function(albums, request) {
     var prioritizedAlbums = {
       lowPriorityAlbums: [],
+      mediumPriorityAlbums: [],
       highPriorityAlbums: [],
     };
 
     albums.forEach( (album) =>  {
-      if (isAlbumHighPriority(album, request)) {
+      const albumPriority = getAlbumPriority(album, request);
+      if (albumPriority === "high") {
         prioritizedAlbums.highPriorityAlbums.push(album);
+      } else if (albumPriority === "medium") {
+        prioritizedAlbums.mediumPriorityAlbums.push(album);
       } else {
         prioritizedAlbums.lowPriorityAlbums.push(album);
       }

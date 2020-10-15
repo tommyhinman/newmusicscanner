@@ -3,7 +3,7 @@ const { v4: uuidv4}  = require('uuid');
 const { createRequest, getLatestRequest, getRecentRequests, getRequest, storeScanRequestData, getScanRequestData } = require('./storage/requestsDao');
 const { getFoundAlbumsForRequest } = require('./storage/albumsDao');
 const moment = require('moment-timezone');
-const { flattenRequestFoundAlbums, filterRequestFoundAlbums, prioritizeRequestFoundAlbums } = require('requestProcessor/requestProcessor')
+const { flattenRequestFoundAlbums, filterRequestFoundAlbums, prioritizeRequestFoundAlbums, sortRequestFoundAlbums } = require('requestProcessor/requestProcessor')
 
 let response;
 
@@ -58,10 +58,13 @@ async function processScanRequest(requestId) {
   // 3) Filter out unwanted albums.
   const filteredAlbums = await filterRequestFoundAlbums(flattenedAlbums);
 
-  // 3) Prioritize and sort albums.
-  const prioritizedAlbums = await prioritizeRequestFoundAlbums(filteredAlbums, request);
+  // 4) Sort albums.
+  const sortedAlbums = await sortRequestFoundAlbums(filteredAlbums);
 
-  // 4) Store in processed request table
+  // 5) Prioritize and sort albums.
+  const prioritizedAlbums = await prioritizeRequestFoundAlbums(sortedAlbums, request);
+
+  // 6) Store in processed request table
   await storeScanRequestData(requestId, prioritizedAlbums);
   // console.log(JSON.stringify(prioritizedAlbums));
 }
