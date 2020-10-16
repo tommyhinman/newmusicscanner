@@ -62,7 +62,7 @@ async function spotifyApiDelete(authToken, url, data) {
       }
     );
   } catch (error) {
-    const errorMessage = "Error calling DELETE api from Spotify with url: " + url);
+    const errorMessage = "Error calling DELETE api from Spotify with url: " + url;
     console.error(errorMessage, error);
   }
 }
